@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickRick - E-Rickshaw</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .nav-active {
+            background-color: #22c55e;
+            color: white;
+        }
+        .stop-card {
+            transition: all 0.3s ease;
+        }
+        .stop-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl overflow-hidden">
+        <!-- Header -->
+        <header class="bg-green-600 text-white p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-car-side text-3xl"></i>
+                <div>
+                    <h1 class="text-2xl font-bold">QuickRick</h1>
+                    <p class="text-xs opacity-75 -mt-1">E-Rickshaw Booking</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm font-medium">Guwahati</p>
+                <p id="current-time" class="text-xs opacity-75"></p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div id="home-screen" class="p-6">
+            <div class="text-center py-8">
+                <div class="w-24 h-24 mx-auto bg-green-100 rounded-3xl flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-car-side text-6xl text-green-600"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome!</h2>
+                <p class="text-gray-600">Are you a Driver or Passenger?</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mt-12">
+                <!-- Passenger Card -->
+                <div onclick="showPassengerScreen()" 
+                     class="stop-card bg-white border-2 border-green-200 hover:border-green-500 rounded-3xl p-8 text-center cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-user text-4xl text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl text-gray-800">Passenger</h3>
+                    <p class="text-sm text-gray-500 mt-1">Book a ride</p>
+                </div>
+
+                <!-- Driver Card -->
+                <div onclick="showDriverScreen()" 
+                     class="stop-card bg-white border-2 border-green-200 hover:border-green-500 rounded-3xl p-8 text-center cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-steering-wheel text-4xl text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold text-xl text-gray-800">Driver</h3>
+                    <p class="text-sm text-gray-500 mt-1">Find rides</p>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-xs text-gray-400">Demo • Single HTML File</p>
+            </div>
+        </div>
+
+        <!-- Passenger Screen -->
+        <div id="passenger-screen" class="hidden flex flex-col min-h-screen">
+            <div class="p-4 border-b flex items-center gap-3 bg-white">
+                <button onclick="goHome()" class="p-2 hover:bg-gray-100 rounded-xl">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="font-bold text-xl">Book Ride</h2>
+            </div>
+
+            <div class="p-6 flex-1">
+                <!-- Current Location -->
+                <div class="mb-8">
+                    <p class="text-sm text-gray-500 mb-2">Your nearest stoppage</p>
+                    <div id="nearest-stop" 
+                         class="bg-green-50 border border-green-200 rounded-2xl p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-green-600 text-white rounded-xl flex items-center justify-center text-2xl">
+                            📍
+                        </div>
+                        <div>
+                            <p id="nearest-name" class="font-semibold text-lg capitalize"></p>
+                            <p class="text-green-600 text-sm">2 min walk • Available now</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Destination -->
+                <div class="mb-8">
+                    <label class="block text-sm text-gray-500 mb-3">Where do you want to go?</label>
+                    <div class="grid grid-cols-2 gap-3" id="dest-options">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Passengers -->
+                <div class="mb-8">
+                    <label class="block text-sm text-gray-500 mb-3">How many E-Rickshaws do you need?</label>
+                    <div class="flex gap-4">
+                        <button onclick="setCount(1)" id="count-1"
+                                class="flex-1 py-4 rounded-2xl border-2 border-green-200 hover:border-green-500 text-lg font-semibold">1</button>
+                        <button onclick="setCount(2)" id="count-2"
+                                class="flex-1 py-4 rounded-2xl border-2 border-green-200 hover:border-green-500 text-lg font-semibold">2</button>
+                        <button onclick="setCount(3)" id="count-3"
+                                class="flex-1 py-4 rounded-2xl border-2 border-green-200 hover:border-green-500 text-lg font-semibold">3</button>
+                    </div>
+                </div>
+
+                <!-- Confirm Button -->
+                <button onclick="confirmPassengerBooking()"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-3xl text-lg font-semibold flex items-center justify-center gap-3">
+                    <span>Confirm Booking</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Driver Screen -->
+        <div id="driver-screen" class="hidden flex flex-col min-h-screen">
+            <div class="p-4 border-b flex items-center gap-3 bg-white">
+                <button onclick="goHome()" class="p-2 hover:bg-gray-100 rounded-xl">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <h2 class="font-bold text-xl">Find Passengers</h2>
+            </div>
+
+            <div class="p-6 flex-1">
+                <p class="text-sm text-gray-500 mb-4">Stoppages needing E-Rickshaws right now</p>
+                
+                <div id="driver-stop-list" class="space-y-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <button onclick="confirmDriverBooking()" id="driver-confirm-btn"
+                        class="hidden w-full mt-8 bg-green-600 hover:bg-green-700 text-white py-5 rounded-3xl text-lg font-semibold">
+                    Accept Ride to <span id="selected-destination"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Confirmation Screen -->
+        <div id="confirmation-screen" class="hidden flex flex-col items-center justify-center min-h-screen bg-green-50 p-6 text-center">
+            <div class="w-28 h-28 bg-green-100 rounded-full flex items-center justify-center mb-8">
+                <i class="fa-solid fa-check text-7xl text-green-600"></i>
+            </div>
+            
+            <h2 id="confirm-title" class="text-3xl font-bold text-gray-800 mb-2">Booking Confirmed!</h2>
+            <p id="confirm-subtitle" class="text-gray-600 max-w-xs"></p>
+            
+            <div class="mt-12 w-full max-w-xs bg-white rounded-3xl p-6 text-left">
+                <div class="flex justify-between text-sm mb-3">
+                    <span class="text-gray-500">From</span>
+                    <span id="confirm-from" class="font-medium capitalize"></span>
+                </div>
+                <div class="flex justify-between text-sm mb-3">
+                    <span class="text-gray-500">To</span>
+                    <span id="confirm-to" class="font-medium capitalize"></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Rickshaws</span>
+                    <span id="confirm-count" class="font-medium"></span>
+                </div>
+            </div>
+
+            <button onclick="goHome()" 
+                    class="mt-12 w-full max-w-xs bg-green-600 text-white py-4 rounded-3xl font-semibold">
+                Back to Home
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script already loaded via CDN
+        const stoppages = ["ganeshguri", "hatigaon", "beltola", "uzaanbazar"];
+
+        let currentNearest = "";
+        let selectedDestination = "";
+        let selectedCount = 1;
+        let driverSelectedStop = "";
+
+        function getRandomStop(exclude = "") {
+            let filtered = stoppages.filter(s => s !== exclude);
+            return filtered[Math.floor(Math.random() * filtered.length)];
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById("current-time").textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showPassengerScreen() {
+            document.getElementById("home-screen").classList.add("hidden");
+            document.getElementById("passenger-screen").classList.remove("hidden");
+            
+            // Set random nearest stop
+            currentNearest = getRandomStop();
+            document.getElementById("nearest-name").textContent = currentNearest;
+            
+            // Generate destination options
+            const destContainer = document.getElementById("dest-options");
+            destContainer.innerHTML = "";
+            
+            stoppages.forEach(stop => {
+                if (stop === currentNearest) return;
+                const btn = document.createElement("button");
+                btn.className = `py-6 rounded-3xl text-lg font-medium border-2 ${selectedDestination === stop ? 'border-green-600 bg-green-50' : 'border-gray-200 hover:border-green-300'}`;
+                btn.textContent = stop.charAt(0).toUpperCase() + stop.slice(1);
+                btn.onclick = () => selectDestination(stop, btn);
+                destContainer.appendChild(btn);
+            });
+        }
+
+        function selectDestination(stop, element) {
+            selectedDestination = stop;
+            // Re-render to show selection
+            showPassengerScreen();
+        }
+
+        function setCount(count) {
+            selectedCount = count;
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`count-${i}`);
+                if (el) {
+                    if (i === count) {
+                        el.classList.add("border-green-600", "bg-green-50");
+                    } else {
+                        el.classList.remove("border-green-600", "bg-green-50");
+                    }
+                }
+            }
+        }
+
+        function confirmPassengerBooking() {
+            if (!selectedDestination) {
+                alert("Please select a destination!");
+                return;
+            }
+            
+            document.getElementById("passenger-screen").classList.add("hidden");
+            const conf = document.getElementById("confirmation-screen");
+            conf.classList.remove("hidden");
+            
+            document.getElementById("confirm-title").textContent = "Ride Booked!";
+            document.getElementById("confirm-subtitle").textContent = "Your E-Rickshaw is on the way";
+            document.getElementById("confirm-from").textContent = currentNearest;
+            document.getElementById("confirm-to").textContent = selectedDestination;
+            document.getElementById("confirm-count").textContent = selectedCount + " rickshaw" + (selectedCount > 1 ? "s" : "");
+        }
+
+        function showDriverScreen() {
+            document.getElementById("home-screen").classList.add("hidden");
+            document.getElementById("driver-screen").classList.remove("hidden");
+            
+            const listContainer = document.getElementById("driver-stop-list");
+            listContainer.innerHTML = "";
+            
+            // Show 2-3 random demand stops
+            const demands = [];
+            for (let i = 0; i < 3; i++) {
+                const stop = getRandomStop();
+                if (!demands.includes(stop)) demands.push(stop);
+            }
+            
+            demands.forEach(stop => {
+                const card = document.createElement("div");
+                card.className = `stop-card bg-white border-2 border-gray-100 rounded-3xl p-5 flex justify-between items-center cursor-pointer ${driverSelectedStop === stop ? 'border-green-600' : ''}`;
+                card.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-lg capitalize">${stop}</p>
+                        <p class="text-green-600 text-sm">3 passengers waiting • 2 min ago</p>
+                    </div>
+                    <button onclick="selectDriverStop('${stop}', this)" 
+                            class="bg-green-600 text-white px-6 py-3 rounded-2xl text-sm font-medium">
+                        Go
+                    </button>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function selectDriverStop(stop, btn) {
+            driverSelectedStop = stop;
+            document.getElementById("selected-destination").textContent = stop;
+            document.getElementById("driver-confirm-btn").classList.remove("hidden");
+            
+            // Refresh list to show selection
+            showDriverScreen();
+        }
+
+        function confirmDriverBooking() {
+            if (!driverSelectedStop) return;
+            
+            document.getElementById("driver-screen").classList.add("hidden");
+            const conf = document.getElementById("confirmation-screen");
+            conf.classList.remove("hidden");
+            
+            document.getElementById("confirm-title").textContent = "Ride Accepted!";
+            document.getElementById("confirm-subtitle").textContent = "Head to the stoppage now";
+            document.getElementById("confirm-from").textContent = "Your Location";
+            document.getElementById("confirm-to").textContent = driverSelectedStop;
+            document.getElementById("confirm-count").textContent = "Multiple passengers";
+        }
+
+        function goHome() {
+            // Reset all screens
+            document.getElementById("home-screen").classList.remove("hidden");
+            document.getElementById("passenger-screen").classList.add("hidden");
+            document.getElementById("driver-screen").classList.add("hidden");
+            document.getElementById("confirmation-screen").classList.add("hidden");
+            
+            // Reset variables
+            selectedDestination = "";
+            selectedCount = 1;
+            driverSelectedStop = "";
+        }
+
+        // Initialize
+        window.onload = function() {
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // Default count selection
+            setTimeout(() => {
+                const defaultCount = document.getElementById("count-1");
+                if (defaultCount) defaultCount.classList.add("border-green-600", "bg-green-50");
+            }, 500);
+        };
+    </script>
+</body>
+</html>
